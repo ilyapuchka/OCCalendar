@@ -471,9 +471,9 @@
 	float arrowPosX = 208;
 	
 	if(arrowPosition == OCArrowPositionLeft) {
-		arrowPosX = 80;
+		arrowPosX = 70;
 	} else if(arrowPosition == OCArrowPositionRight) {
-		arrowPosX = 323;
+		arrowPosX = 333;
 	}
     
     if([daysView addExtraRow]) {
