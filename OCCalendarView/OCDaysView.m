@@ -29,6 +29,10 @@
     return self;
 }
 
+-(void)setEnabledDates:(NSArray *)enabledDates
+{
+    _enabledDates = [enabledDates retain];
+}
 
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
@@ -117,7 +121,15 @@
                 if([today day] == day && [today month] == month && [today year] == year) {
                     [[UIColor colorWithRed: 0.98 green: 0.24 blue: 0.09 alpha: 1] setFill];
                 } else {
-                    [[UIColor whiteColor] setFill];
+                    NSDateComponents *comps = [[NSDateComponents alloc] init];
+                    [comps setDay:day]; [comps setMonth:month]; [comps setYear:year];
+                    NSDate *date = [calendar dateFromComponents:comps];
+                    if ([self.enabledDates containsObject:date]) {
+                        [[UIColor whiteColor] setFill];
+                    }
+                    else {
+                        [[UIColor grayColor] setFill];
+                    }
                 }
                 [str drawInRect: dayHeader2Frame withFont: [UIFont fontWithName: @"Helvetica" size: 12] lineBreakMode: UILineBreakModeWordWrap alignment: UITextAlignmentCenter];
                 CGContextRestoreGState(context);

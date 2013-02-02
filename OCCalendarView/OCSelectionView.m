@@ -88,7 +88,7 @@
             }
             CGFloat cornerRadius;
             if(_selectionMode == OCSelectionSingleDate) {
-                cornerRadius = 0.0;
+                cornerRadius = 10.0;
             } else {
                 cornerRadius = 10.0;
             }
@@ -153,6 +153,9 @@
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     if(_selectionMode == OCSelectionSingleDate) {
         [self singleSelection:touches];
+        if ([self.delegate respondsToSelector:@selector(didChangeSelection:)]) {
+            [self.delegate didChangeSelection:self.selected];
+        }
         return;
     }
     UITouch *touch = [touches anyObject];

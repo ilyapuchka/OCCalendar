@@ -40,10 +40,11 @@
 @property (nonatomic, retain) NSDate *startDate;
 @property (nonatomic, retain) NSDate *endDate;
 @property (nonatomic, assign) OCSelectionMode selectionMode;
+@property (nonatomic, retain) NSArray *enabledDates;
 
 - (id)initAtPoint:(CGPoint)point inView:(UIView *)v;
 - (id)initAtPoint:(CGPoint)point inView:(UIView *)v arrowPosition:(OCArrowPosition)ap;
 - (id)initAtPoint:(CGPoint)point inView:(UIView *)v arrowPosition:(OCArrowPosition)ap selectionMode:(OCSelectionMode)sm;
-
+- (void)removeCalViewAnimated;
 
 @end

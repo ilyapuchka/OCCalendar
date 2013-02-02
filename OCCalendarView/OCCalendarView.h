@@ -19,6 +19,13 @@ typedef enum {
 @class OCSelectionView;
 @class OCDaysView;
 
+@protocol OCCalendarViewDelegate <NSObject>
+
+- (void)didChangeSelection:(BOOL)selected;
+
+@end
+
+
 @interface OCCalendarView : UIView {
     NSCalendar *calendar;
     
@@ -53,5 +60,10 @@ typedef enum {
 - (void)setStartDate:(NSDate *)sDate;
 - (void)setEndDate:(NSDate *)eDate;
 
+- (void)setEnabledDates:(NSArray *)enableDates;
+
 @property OCSelectionMode selectionMode;
+@property (nonatomic, retain) NSArray *enabledDates;
+@property (nonatomic, assign) id<OCCalendarViewDelegate> delegate;
+
 @end

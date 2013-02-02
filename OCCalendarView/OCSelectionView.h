@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "OCTypes.h"
+
+@protocol OCSelectionViewDelegate <NSObject>
+
+- (void)didChangeSelection:(BOOL)selected;
+
+@end
+
 @interface OCSelectionView : UIView {
     BOOL selected;
     int startCellX;
@@ -31,5 +38,6 @@
 -(void)setEndPoint:(CGPoint)ePoint;
 @property(nonatomic, assign) OCSelectionMode selectionMode;
 @property (nonatomic, assign) BOOL selected;
+@property (nonatomic, assign) id<OCSelectionViewDelegate> delegate;
 
 @end

@@ -33,4 +33,6 @@
 
 - (BOOL)addExtraRow;
 
+@property (nonatomic, retain) NSArray *enabledDates;
+
 @end

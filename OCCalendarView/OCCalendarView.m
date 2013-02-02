@@ -10,8 +10,9 @@
 #import "OCSelectionView.h"
 #import "OCDaysView.h"
 #import <QuartzCore/QuartzCore.h>
+#import "NSDate+Reporting.h"
 
-@interface OCCalendarView () {
+@interface OCCalendarView () <OCSelectionViewDelegate> {
     OCSelectionMode _selectionMode;
 }
 @end
@@ -57,7 +58,8 @@
     
     selectionView = [[OCSelectionView alloc] initWithFrame:CGRectMake(66, 95, hDiff*7, vDiff*6)];
     [self addSubview:selectionView];
-    
+    selectionView.delegate = self;
+      
 	float xpos = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone ? 68 : 65;
     daysView = [[OCDaysView alloc] initWithFrame:CGRectMake(xpos, 98, hDiff*7, vDiff*6)];
     [daysView setYear:currentYear];
@@ -146,6 +148,15 @@
 - (BOOL)selected {
     //NSLog(@"Selected:%d", [selectionView selected]);
     return [selectionView selected];
+}
+
+- (void)didChangeSelection:(BOOL)selected
+{
+    if (self.enabledDates && [self.enabledDates containsObject:[self getStartDate]]) {
+        if ([self.delegate respondsToSelector:@selector(didChangeSelection:)]) {
+            [self.delegate didChangeSelection:selected];
+        }
+    }
 }
 
 - (void)setArrowPosition:(OCArrowPosition)pos {
@@ -265,8 +276,19 @@
     return retDate;
 }
 
+- (void)setEnabledDates:(NSArray *)enableDates
+{
+    _enabledDates = [enableDates retain];
+    daysView.enabledDates = self.enabledDates;
+    [daysView resetRows];
+}
+
 - (void)setStartDate:(NSDate *)sDate {
     //NSLog(@"setStartDate");
+    
+    if (self.enabledDates && ![self.enabledDates containsObject:[NSDate midnightOfDate:sDate]]) {
+        return;
+    }
     
     NSDateComponents *sComponents = [[NSCalendar currentCalendar] components:NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit fromDate:sDate];
     

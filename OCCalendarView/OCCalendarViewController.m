@@ -9,7 +9,7 @@
 #import "OCCalendarViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface OCCalendarViewController ()
+@interface OCCalendarViewController () <OCCalendarViewDelegate>
 
 @end
 
@@ -63,6 +63,11 @@
     
     calView = [[OCCalendarView alloc] initAtPoint:insertPoint withFrame:CGRectMake(insertPoint.x - arrowPosX, insertPoint.y - 31.4, width, height) arrowPosition:arrowPos];
     [calView setSelectionMode:selectionMode];
+    calView.delegate = self;
+    
+    if(self.enabledDates) {
+        [calView setEnabledDates:_enabledDates];
+    }
     if(self.startDate) {
         [calView setStartDate:startDate];
     }
@@ -94,6 +99,12 @@
     [calView setEndDate:endDate];
 }
 
+- (void)setEnabledDates:(NSArray *)enabledDates
+{
+    _enabledDates = [enabledDates retain];
+    [calView setEnabledDates:_enabledDates];
+}
+
 - (void)removeCalView {
     startDate = [[calView getStartDate] retain];
     endDate = [[calView getEndDate] retain];
@@ -115,16 +126,26 @@
     calView = nil;
 }
 
+- (void)didChangeSelection:(BOOL)selected
+{
+    [self removeCalViewAnimated];
+}
+
+- (void)removeCalViewAnimated
+{
+    [UIView beginAnimations:@"animateOutCalendar" context:nil];
+    [UIView setAnimationDuration:0.4f];
+    calView.transform = CGAffineTransformMakeScale(0.1, 0.1);
+    calView.alpha = 0.0f;
+    [UIView commitAnimations];
+
+    [self performSelector:@selector(removeCalView) withObject:nil afterDelay:0.4f];
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     if(calView) {
         //Animate out the calendar view if it already exists
-        [UIView beginAnimations:@"animateOutCalendar" context:nil];
-        [UIView setAnimationDuration:0.4f];
-        calView.transform = CGAffineTransformMakeScale(0.1, 0.1);
-        calView.alpha = 0.0f;
-        [UIView commitAnimations];
-        
-        [self performSelector:@selector(removeCalView) withObject:nil afterDelay:0.4f];
+        [self removeCalViewAnimated];
     } else {
         //Recreate the calendar if it doesn't exist.
         
