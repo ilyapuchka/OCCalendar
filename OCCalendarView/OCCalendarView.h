@@ -27,8 +27,6 @@ typedef enum {
 
 
 @interface OCCalendarView : UIView {
-    NSCalendar *calendar;
-    
     int currentMonth;
     int currentYear;
     

@@ -8,7 +8,26 @@
 
 #import "OCDaysView.h"
 
+@interface OCDaysView()
+
+@property (nonatomic, strong) NSCalendar *calendar;
+
+@end
+
 @implementation OCDaysView
+
+- (void)setEnabledDates:(NSArray *)enabledDates
+{
+    _enabledDates = [enabledDates copy];
+}
+
+- (NSCalendar *)calendar
+{
+    if (!_calendar) {
+        _calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    }
+    return _calendar;
+}
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -29,11 +48,6 @@
     return self;
 }
 
--(void)setEnabledDates:(NSArray *)enabledDates
-{
-    _enabledDates = [enabledDates retain];
-}
-
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
@@ -43,8 +57,6 @@
     CGFloat shadow2BlurRadius = 1;
     CGColorRef shadow2 = [UIColor blackColor].CGColor;
     
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    
     int month = currentMonth;
     int year = currentYear;
 	
@@ -53,14 +65,14 @@
 	[dateParts setMonth:month];
 	[dateParts setYear:year];
 	[dateParts setDay:1];
-	NSDate *dateOnFirst = [calendar dateFromComponents:dateParts];
-	[dateParts release];
-	NSDateComponents *weekdayComponents = [calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
+	NSDate *dateOnFirst = [self.calendar dateFromComponents:dateParts];
+	
+    NSDateComponents *weekdayComponents = [self.calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
 	int weekdayOfFirst = [weekdayComponents weekday];	
     
     //NSLog(@"weekdayOfFirst:%d", weekdayOfFirst);
 
-	int numDaysInMonth = [calendar rangeOfUnit:NSDayCalendarUnit 
+	int numDaysInMonth = [self.calendar rangeOfUnit:NSDayCalendarUnit 
 										inUnit:NSMonthCalendarUnit 
                                        forDate:dateOnFirst].length;
     
@@ -78,11 +90,9 @@
 	[prevDateParts setYear:year];
 	[prevDateParts setDay:1];
     
-    NSDate *prevDateOnFirst = [calendar dateFromComponents:prevDateParts];
+    NSDate *prevDateOnFirst = [self.calendar dateFromComponents:prevDateParts];
     
-    [prevDateParts release];
-    
-    int numDaysInPrevMonth = [calendar rangeOfUnit:NSDayCalendarUnit 
+    int numDaysInPrevMonth = [self.calendar rangeOfUnit:NSDayCalendarUnit
 										inUnit:NSMonthCalendarUnit 
                                        forDate:prevDateOnFirst].length;
     
@@ -108,7 +118,9 @@
     BOOL endedOnSat = NO;
 	int finalRow = 0;
 	int day = 1;
-	for (int i = 0; i < 6; i++) {
+	NSDateComponents *comps = [[NSDateComponents alloc] init];
+    
+    for (int i = 0; i < 6; i++) {
 		for(int j = 0; j < 7; j++) {
 			int dayNumber = i * 7 + j;
 			
@@ -121,9 +133,8 @@
                 if([today day] == day && [today month] == month && [today year] == year) {
                     [[UIColor colorWithRed: 0.98 green: 0.24 blue: 0.09 alpha: 1] setFill];
                 } else {
-                    NSDateComponents *comps = [[NSDateComponents alloc] init];
                     [comps setDay:day]; [comps setMonth:month]; [comps setYear:year];
-                    NSDate *date = [calendar dateFromComponents:comps];
+                    NSDate *date = [self.calendar dateFromComponents:comps];
                     if ([self.enabledDates containsObject:date]) {
                         [[UIColor whiteColor] setFill];
                     }
@@ -156,11 +167,9 @@
 	[nextDateParts setYear:year];
 	[nextDateParts setDay:1];
     
-    NSDate *nextDateOnFirst = [calendar dateFromComponents:nextDateParts];
+    NSDate *nextDateOnFirst = [self.calendar dateFromComponents:nextDateParts];
     
-    [nextDateParts release];
-    
-    NSDateComponents *nextWeekdayComponents = [calendar components:NSWeekdayCalendarUnit fromDate:nextDateOnFirst];
+    NSDateComponents *nextWeekdayComponents = [self.calendar components:NSWeekdayCalendarUnit fromDate:nextDateOnFirst];
 	int weekdayOfNextFirst = [nextWeekdayComponents weekday];
     
     if(!endedOnSat) {
@@ -191,8 +200,6 @@
 }
 
 - (void)resetRows {
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    
     int month = currentMonth;
     int year = currentYear;
 	
@@ -201,12 +208,12 @@
 	[dateParts setMonth:month];
 	[dateParts setYear:year];
 	[dateParts setDay:1];
-	NSDate *dateOnFirst = [calendar dateFromComponents:dateParts];
-	[dateParts release];
-	NSDateComponents *weekdayComponents = [calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
+	NSDate *dateOnFirst = [self.calendar dateFromComponents:dateParts];
+	
+    NSDateComponents *weekdayComponents = [self.calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
 	int weekdayOfFirst = [weekdayComponents weekday];	
     
-	int numDaysInMonth = [calendar rangeOfUnit:NSDayCalendarUnit 
+	int numDaysInMonth = [self.calendar rangeOfUnit:NSDayCalendarUnit 
 										inUnit:NSMonthCalendarUnit 
                                        forDate:dateOnFirst].length;
     didAddExtraRow = NO;

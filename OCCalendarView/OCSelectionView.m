@@ -60,14 +60,14 @@
                                     (id)color.CGColor, 
                                     (id)color2.CGColor, nil];
         CGFloat gradient3Locations[] = {0, 1};
-        CGGradientRef gradient3 = CGGradientCreateWithColors(colorSpace, (CFArrayRef)gradient3Colors, gradient3Locations);
+        CGGradientRef gradient3 = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)gradient3Colors, gradient3Locations);
         
         int tempStart = MIN(startCellY, endCellY);
         int tempEnd = MAX(startCellY, endCellY);
         for(int i = tempStart; i <= tempEnd; i++) {
             //// selectedRect Drawing
-            int thisRowEndCell;
-            int thisRowStartCell;
+            int thisRowEndCell = 0;
+            int thisRowStartCell = 0;
             if(startCellY == i) {
                 thisRowStartCell = startCellX;
                 if (startCellY > endCellY) {

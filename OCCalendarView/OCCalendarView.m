@@ -15,9 +15,20 @@
 @interface OCCalendarView () <OCSelectionViewDelegate> {
     OCSelectionMode _selectionMode;
 }
+
+@property (nonatomic, strong) NSCalendar *calendar;
+
 @end
 
 @implementation OCCalendarView
+
+- (NSCalendar *)calendar
+{
+    if (!_calendar) {
+        _calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    }
+    return _calendar;
+}
 
 -(OCSelectionMode) selectionMode {
     return _selectionMode;
@@ -39,10 +50,8 @@
   if(self) {
     self.backgroundColor = [UIColor clearColor];
     
-    calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-		
     NSUInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit;
-    NSDateComponents *dateParts = [calendar components:unitFlags fromDate:[NSDate date]];
+    NSDateComponents *dateParts = [self.calendar components:unitFlags fromDate:[NSDate date]];
     currentMonth = [dateParts month];
     currentYear = [dateParts year];
     
@@ -177,12 +186,12 @@
 	[dateParts setMonth:month];
 	[dateParts setYear:year];
 	[dateParts setDay:1];
-	NSDate *dateOnFirst = [calendar dateFromComponents:dateParts];
-	[dateParts release];
-	NSDateComponents *weekdayComponents = [calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
+	NSDate *dateOnFirst = [self.calendar dateFromComponents:dateParts];
+	
+    NSDateComponents *weekdayComponents = [self.calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
 	int weekdayOfFirst = [weekdayComponents weekday];	
     
-	int numDaysInMonth = [calendar rangeOfUnit:NSDayCalendarUnit 
+	int numDaysInMonth = [self.calendar rangeOfUnit:NSDayCalendarUnit 
 										inUnit:NSMonthCalendarUnit 
                                        forDate:dateOnFirst].length;
     
@@ -209,11 +218,11 @@
         }
     }
     
-    NSDateComponents *comps = [[[NSDateComponents alloc] init] autorelease];
+    NSDateComponents *comps = [[NSDateComponents alloc] init];
     [comps setDay:day];
     [comps setMonth:month];
     [comps setYear:year];
-    NSDate *retDate = [calendar dateFromComponents:comps];
+    NSDate *retDate = [self.calendar dateFromComponents:comps];
     
     return retDate;
 }
@@ -234,12 +243,12 @@
 	[dateParts setMonth:month];
 	[dateParts setYear:year];
 	[dateParts setDay:1];
-	NSDate *dateOnFirst = [calendar dateFromComponents:dateParts];
-	[dateParts release];
-	NSDateComponents *weekdayComponents = [calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
+	NSDate *dateOnFirst = [self.calendar dateFromComponents:dateParts];
+	
+    NSDateComponents *weekdayComponents = [self.calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
 	int weekdayOfFirst = [weekdayComponents weekday];	
     
-	int numDaysInMonth = [calendar rangeOfUnit:NSDayCalendarUnit 
+	int numDaysInMonth = [self.calendar rangeOfUnit:NSDayCalendarUnit 
 										inUnit:NSMonthCalendarUnit 
                                        forDate:dateOnFirst].length;
 	if(endPoint.y == 0 && endPoint.x+1 < weekdayOfFirst) {
@@ -267,18 +276,18 @@
         }
     }
         
-    NSDateComponents *comps = [[[NSDateComponents alloc] init] autorelease];
+    NSDateComponents *comps = [[NSDateComponents alloc] init];
     [comps setDay:day];
     [comps setMonth:month];
     [comps setYear:year];
-    NSDate *retDate = [calendar dateFromComponents:comps];
+    NSDate *retDate = [self.calendar dateFromComponents:comps];
     
     return retDate;
 }
 
 - (void)setEnabledDates:(NSArray *)enableDates
 {
-    _enabledDates = [enableDates retain];
+    _enabledDates = [enableDates copy];
     daysView.enabledDates = self.enabledDates;
     [daysView resetRows];
 }
@@ -307,12 +316,12 @@
 	[dateParts setMonth:month];
 	[dateParts setYear:year];
 	[dateParts setDay:1];
-	NSDate *dateOnFirst = [calendar dateFromComponents:dateParts];
-	[dateParts release];
-	NSDateComponents *weekdayComponents = [calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
+	NSDate *dateOnFirst = [self.calendar dateFromComponents:dateParts];
+	
+    NSDateComponents *weekdayComponents = [self.calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
 	int weekdayOfFirst = [weekdayComponents weekday];	
     
-	int numDaysInMonth = [calendar rangeOfUnit:NSDayCalendarUnit 
+	int numDaysInMonth = [self.calendar rangeOfUnit:NSDayCalendarUnit 
 										inUnit:NSMonthCalendarUnit 
                                        forDate:dateOnFirst].length;
     
@@ -361,12 +370,12 @@
 	[dateParts setMonth:month];
 	[dateParts setYear:year];
 	[dateParts setDay:1];
-	NSDate *dateOnFirst = [calendar dateFromComponents:dateParts];
-	[dateParts release];
-	NSDateComponents *weekdayComponents = [calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
+	NSDate *dateOnFirst = [self.calendar dateFromComponents:dateParts];
+	
+    NSDateComponents *weekdayComponents = [self.calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
 	int weekdayOfFirst = [weekdayComponents weekday];	
     
-	int numDaysInMonth = [calendar rangeOfUnit:NSDayCalendarUnit 
+	int numDaysInMonth = [self.calendar rangeOfUnit:NSDayCalendarUnit 
 										inUnit:NSMonthCalendarUnit 
                                        forDate:dateOnFirst].length;
     
@@ -438,7 +447,7 @@
                                 (id)darkColor.CGColor,
                                 (id)lightColor.CGColor, nil];
     CGFloat gradient2Locations[] = {0, 1};
-    CGGradientRef gradient2 = CGGradientCreateWithColors(colorSpace, (CFArrayRef)gradient2Colors, gradient2Locations);
+    CGGradientRef gradient2 = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)gradient2Colors, gradient2Locations);
     
     //// Shadow Declarations
     CGColorRef bigBoxInnerShadow = bigBoxInnerShadowColor.CGColor;
@@ -697,7 +706,7 @@
                                 (id)darkColor.CGColor,
                                 (id)lightColor.CGColor, nil];
     CGFloat gradient2Locations[] = {0, 1};
-    CGGradientRef gradient2 = CGGradientCreateWithColors(colorSpace, (CFArrayRef)gradient2Colors, gradient2Locations);
+    CGGradientRef gradient2 = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)gradient2Colors, gradient2Locations);
     
     //// Shadow Declarations
     CGColorRef bigBoxInnerShadow = bigBoxInnerShadowColor.CGColor;
@@ -891,16 +900,6 @@
     CGColorSpaceRelease(colorSpace);
 	
 	
-}
-
-
-- (void)dealloc {
-    
-    [selectionView release];
-    [calendar release];
-    
-    [super dealloc];
-    
 }
 
 @end

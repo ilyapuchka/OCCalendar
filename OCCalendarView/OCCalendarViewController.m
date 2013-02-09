@@ -11,18 +11,23 @@
 
 @interface OCCalendarViewController () <OCCalendarViewDelegate>
 
+@property (nonatomic, strong) UILabel *toolTipLabel;
+@property (nonatomic, strong) OCCalendarView *calView;
+
+@property (nonatomic) CGPoint insertPoint;
+@property (nonatomic) OCArrowPosition arrowPos;
+
 @end
 
 @implementation OCCalendarViewController
-@synthesize delegate, startDate, endDate, selectionMode;
 
 - (id)initAtPoint:(CGPoint)point inView:(UIView *)v arrowPosition:(OCArrowPosition)ap selectionMode:(OCSelectionMode)sm {
     self = [super initWithNibName:nil bundle:nil];
     if(self) {
-        insertPoint = point;
-        parentView = v;
-        arrowPos = ap;
-        selectionMode = sm;
+        _insertPoint = point;
+        _parentView = v;
+        _arrowPos = ap;
+        _selectionMode = sm;
     }
     return self;
 }
@@ -37,7 +42,7 @@
 
 - (void)loadView {
     [super loadView];
-    self.view.frame = parentView.frame;
+    self.view.frame = self.parentView.frame;
     
     
     //this view sits behind the calendar and receives touches.  It tells the calendar view to disappear when tapped.
@@ -45,36 +50,36 @@
     bgView.backgroundColor = [UIColor clearColor];
     UITapGestureRecognizer *tapG = [[UITapGestureRecognizer alloc] init];
     tapG.delegate = self;
-    [bgView addGestureRecognizer:[tapG autorelease]];
+    [bgView addGestureRecognizer:tapG];
     [bgView setUserInteractionEnabled:YES];
     
-    [self.view addSubview:[bgView autorelease]];
+    [self.view addSubview:bgView];
     
     int width = 390;
     int height = 300;
     
     float arrowPosX = 208;
     
-    if(arrowPos == OCArrowPositionLeft) {
+    if(self.arrowPos == OCArrowPositionLeft) {
         arrowPosX = 67;
-    } else if(arrowPos == OCArrowPositionRight) {
+    } else if(self.arrowPos == OCArrowPositionRight) {
         arrowPosX = 346;
     }
     
-    calView = [[OCCalendarView alloc] initAtPoint:insertPoint withFrame:CGRectMake(insertPoint.x - arrowPosX, insertPoint.y - 31.4, width, height) arrowPosition:arrowPos];
-    [calView setSelectionMode:selectionMode];
-    calView.delegate = self;
+    self.calView = [[OCCalendarView alloc] initAtPoint:self.insertPoint withFrame:CGRectMake(self.insertPoint.x - arrowPosX, self.insertPoint.y - 31.4, width, height) arrowPosition:self.arrowPos];
+    [self.calView setSelectionMode:self.selectionMode];
+    self.calView.delegate = self;
     
     if(self.enabledDates) {
-        [calView setEnabledDates:_enabledDates];
+        [self.calView setEnabledDates:self.enabledDates];
     }
     if(self.startDate) {
-        [calView setStartDate:startDate];
+        [self.calView setStartDate:self.startDate];
     }
     if(self.endDate) {
-        [calView setEndDate:endDate];
+        [self.calView setEndDate:self.endDate];
     }
-    [self.view addSubview:[calView autorelease]];
+    [self.view addSubview:self.calView];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -82,48 +87,46 @@
 }
 
 - (void)setStartDate:(NSDate *)sDate {
-    if(startDate) {
-        [startDate release];
-        startDate = nil;
+    if(_startDate) {
+        _startDate = nil;
     }
-    startDate = [sDate retain];
-    [calView setStartDate:startDate];
+    _startDate = [sDate copy];
+    [self.calView setStartDate:_startDate];
 }
 
 - (void)setEndDate:(NSDate *)eDate {
-    if(endDate) {
-        [endDate release];
-        endDate = nil;
+    if(_endDate) {
+        _endDate = nil;
     }
-    endDate = [eDate retain];
-    [calView setEndDate:endDate];
+    _endDate = [eDate copy];
+    [self.calView setEndDate:_endDate];
 }
 
 - (void)setEnabledDates:(NSArray *)enabledDates
 {
-    _enabledDates = [enabledDates retain];
-    [calView setEnabledDates:_enabledDates];
+    _enabledDates = [enabledDates copy];
+    [self.calView setEnabledDates:_enabledDates];
 }
 
 - (void)removeCalView {
-    startDate = [[calView getStartDate] retain];
-    endDate = [[calView getEndDate] retain];
+    self.startDate = [self.calView getStartDate];
+    self.endDate = [self.calView getEndDate];
     
     //NSLog(@"startDate:%@ endDate:%@", startDate.description, endDate.description);
     
     //NSLog(@"CalView Selected:%d", [calView selected]);
     
-    if([calView selected]) {
-        if([startDate compare:endDate] == NSOrderedAscending)
-            [self.delegate completedWithStartDate:startDate endDate:endDate];
+    if([self.calView selected]) {
+        if([self.startDate compare:self.endDate] == NSOrderedAscending)
+            [self.delegate completedWithStartDate:self.startDate endDate:self.endDate];
         else
-            [self.delegate completedWithStartDate:endDate endDate:startDate];
+            [self.delegate completedWithStartDate:self.endDate endDate:self.startDate];
     } else {
         [self.delegate completedWithNoSelection];
     }
     
-    [calView removeFromSuperview];
-    calView = nil;
+    [self.calView removeFromSuperview];
+    self.calView = nil;
 }
 
 - (void)didChangeSelection:(BOOL)selected
@@ -135,15 +138,15 @@
 {
     [UIView beginAnimations:@"animateOutCalendar" context:nil];
     [UIView setAnimationDuration:0.4f];
-    calView.transform = CGAffineTransformMakeScale(0.1, 0.1);
-    calView.alpha = 0.0f;
+    self.calView.transform = CGAffineTransformMakeScale(0.1, 0.1);
+    self.calView.alpha = 0.0f;
     [UIView commitAnimations];
 
     [self performSelector:@selector(removeCalView) withObject:nil afterDelay:0.4f];
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    if(calView) {
+    if(self.calView) {
         //Animate out the calendar view if it already exists
         [self removeCalViewAnimated];
     } else {
@@ -154,8 +157,8 @@
         int width = 390;
         int height = 300;
         
-        calView = [[OCCalendarView alloc] initAtPoint:point withFrame:CGRectMake(point.x - width*0.5, point.y - 31.4, width, height)];
-        [self.view addSubview:[calView autorelease]];
+        self.calView = [[OCCalendarView alloc] initAtPoint:point withFrame:CGRectMake(point.x - width*0.5, point.y - 31.4, width, height)];
+        [self.view addSubview:self.calView];
     }
     
     return YES;
@@ -164,12 +167,6 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return YES;
-}
-
-- (void)dealloc {
-    self.startDate = nil;
-    self.endDate = nil;
-    [super dealloc];
 }
 
 @end
