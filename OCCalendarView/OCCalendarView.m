@@ -11,6 +11,7 @@
 #import "OCDaysView.h"
 #import <QuartzCore/QuartzCore.h>
 #import "NSDate+Reporting.h"
+#import "CCLocalizationManager.h"
 
 @interface OCCalendarView () <OCSelectionViewDelegate> {
     OCSelectionMode _selectionMode;
@@ -427,7 +428,8 @@
 {
     //// Get day titles from current Locale
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    NSArray *dayTitles = [dateFormatter shortStandaloneWeekdaySymbols];
+    [dateFormatter setLocale:[CCLocalizationManager localeForCurrentLanguage]];
+    NSArray *dayTitles = [CCLocalizationManager shortStandaloneWeekdaySymbols:dateFormatter];
     NSArray *monthTitles = [dateFormatter standaloneMonthSymbols];
 	
     //// General Declarations
@@ -686,7 +688,7 @@
 {
     //// Get day titles from current Locale
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    NSArray *dayTitles = [dateFormatter shortStandaloneWeekdaySymbols];
+    NSArray *dayTitles = [CCLocalizationManager shortStandaloneWeekdaySymbols:dateFormatter];
     NSArray *monthTitles = [dateFormatter standaloneMonthSymbols];
 	
     //// General Declarations

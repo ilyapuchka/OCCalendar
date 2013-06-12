@@ -7,6 +7,7 @@
 //
 
 #import "OCDaysView.h"
+#import "CCLocalizationManager.h"
 
 @interface OCDaysView()
 
@@ -24,7 +25,7 @@
 - (NSCalendar *)calendar
 {
     if (!_calendar) {
-        _calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        _calendar = [CCLocalizationManager calendarForCurrentLanguage];
     }
     return _calendar;
 }
@@ -68,7 +69,9 @@
 	NSDate *dateOnFirst = [self.calendar dateFromComponents:dateParts];
 	
     NSDateComponents *weekdayComponents = [self.calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
-	int weekdayOfFirst = [weekdayComponents weekday];	
+	int weekdayOfFirst = [weekdayComponents weekday];
+    
+    weekdayOfFirst = [self.calendar ordinalityOfUnit:NSWeekdayCalendarUnit inUnit:NSWeekCalendarUnit forDate:dateOnFirst];
     
     //NSLog(@"weekdayOfFirst:%d", weekdayOfFirst);
 
