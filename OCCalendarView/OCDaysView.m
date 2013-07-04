@@ -83,10 +83,6 @@
     
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    didAddExtraRow = NO;
-    
-    
-    
     //Find number of days in previous month
     NSDateComponents *prevDateParts = [[NSDateComponents alloc] init];
 	[prevDateParts setMonth:month-1];
@@ -120,23 +116,26 @@
     
     BOOL endedOnSat = NO;
 	int finalRow = 0;
-	int day = 1;
 	NSDateComponents *comps = [[NSDateComponents alloc] init];
+    
+    int dayInAWeek = weekdayOfFirst;
+    int dayInAMonth = 1;
+    numberOfRows = 1;
     
     for (int i = 0; i < 6; i++) {
 		for(int j = 0; j < 7; j++) {
 			int dayNumber = i * 7 + j;
 			
-			if(dayNumber >= (weekdayOfFirst-1) && day <= numDaysInMonth) {
-                NSString *str = [NSString stringWithFormat:@"%d", day];
+			if(dayNumber >= (weekdayOfFirst-1) && dayInAMonth <= numDaysInMonth) {
+                NSString *str = [NSString stringWithFormat:@"%d", dayInAMonth];
                 
                 CGContextSaveGState(context);
                 CGContextSetShadowWithColor(context, shadow2Offset, shadow2BlurRadius, shadow2);
                 CGRect dayHeader2Frame = CGRectMake(j*hDiff, i*vDiff, 21, 14);
-                if([today day] == day && [today month] == month && [today year] == year) {
+                if([today day] == dayInAMonth && [today month] == month && [today year] == year) {
                     [[UIColor colorWithRed: 0.98 green: 0.24 blue: 0.09 alpha: 1] setFill];
                 } else {
-                    [comps setDay:day]; [comps setMonth:month]; [comps setYear:year];
+                    [comps setDay:dayInAMonth]; [comps setMonth:month]; [comps setYear:year];
                     NSDate *date = [self.calendar dateFromComponents:comps];
                     if ([self.enabledDates containsObject:date]) {
                         [[UIColor whiteColor] setFill];
@@ -150,16 +149,17 @@
                 
                 finalRow = i;
                 
-                if(day == numDaysInMonth && j == 6) {
+                if(dayInAMonth == numDaysInMonth && j == 6) {
                     endedOnSat = YES;
                 }
                 
-                if(i == 5) {
-                    didAddExtraRow = YES;
-                    //NSLog(@"didAddExtraRow");
+                if (dayInAWeek > 7) {
+                    dayInAWeek = 1;
+                    numberOfRows++;
                 }
-                
-				++day;
+
+				dayInAMonth++;
+                dayInAWeek++;
 			}
 		}
 	}
@@ -174,6 +174,12 @@
     
     NSDateComponents *nextWeekdayComponents = [self.calendar components:NSWeekdayCalendarUnit fromDate:nextDateOnFirst];
 	int weekdayOfNextFirst = [nextWeekdayComponents weekday];
+    if (self.calendar.firstWeekday == 2) {
+        weekdayOfNextFirst--;
+        if (weekdayOfNextFirst == 0) {
+            weekdayOfNextFirst = 7;
+        }
+    }
     
     if(!endedOnSat) {
         //Draw the text for each of those days.
@@ -215,29 +221,32 @@
 	
     NSDateComponents *weekdayComponents = [self.calendar components:NSWeekdayCalendarUnit fromDate:dateOnFirst];
 	int weekdayOfFirst = [weekdayComponents weekday];	
-    
-	int numDaysInMonth = [self.calendar rangeOfUnit:NSDayCalendarUnit 
+    if (self.calendar.firstWeekday == 2) {
+        weekdayOfFirst--;
+        if (weekdayOfFirst == 0) {
+            weekdayOfFirst = 7;
+        }
+    }
+
+	int numDaysInMonth = [self.calendar rangeOfUnit:NSDayCalendarUnit
 										inUnit:NSMonthCalendarUnit 
                                        forDate:dateOnFirst].length;
-    didAddExtraRow = NO;
-	
-	int day = 1;
-	for (int i = 0; i < 6; i++) {
-		for(int j = 0; j < 7; j++) {
-			int dayNumber = i * 7 + j;
-			if(dayNumber >= (weekdayOfFirst - 1) && day <= numDaysInMonth) {
-                if(i == 5) {
-                    didAddExtraRow = YES;
-                    //NSLog(@"didAddExtraRow");
-                }
-				++day;
-			}
-		}
-	}
+
+    int dayInAWeek = weekdayOfFirst;
+    int dayInAMonth = 1;
+    numberOfRows = 1;
+    while (dayInAMonth <= numDaysInMonth) {
+        if (dayInAWeek > 7) {
+            dayInAWeek = 1;
+            numberOfRows++;
+        }
+        dayInAWeek++;
+        dayInAMonth++;
+    }
 }
 
-- (BOOL)addExtraRow {
-    return didAddExtraRow;
+- (int)numberOfRows {
+    return numberOfRows;
 }
 
 

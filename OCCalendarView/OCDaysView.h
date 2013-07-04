@@ -23,7 +23,7 @@
     int currentMonth;
     int currentYear;
     
-    BOOL didAddExtraRow;
+    int numberOfRows;
 }
 
 - (void)setMonth:(int)month;
@@ -31,7 +31,7 @@
 
 - (void)resetRows;
 
-- (BOOL)addExtraRow;
+- (int)numberOfRows;
 
 @property (nonatomic, copy) NSArray *enabledDates;
 

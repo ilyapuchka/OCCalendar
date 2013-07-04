@@ -77,7 +77,7 @@
     [daysView resetRows];
     [self addSubview:daysView];
     
-    selectionView.frame = CGRectMake(66, 95, hDiff * 7, ([daysView addExtraRow] ? 6 : 5)*vDiff);
+    selectionView.frame = CGRectMake(66, 95, hDiff * 7, [daysView numberOfRows]*vDiff);
     
     //Make the view really small and invisible
     CGAffineTransform tranny = CGAffineTransformMakeScale(0.1, 0.1);
@@ -146,7 +146,7 @@
     [daysView setNeedsDisplay];
     [self setNeedsDisplay];
     
-    selectionView.frame = CGRectMake(66, 95, hDiff * 7, ([daysView addExtraRow] ? 6 : 5)*vDiff);
+    selectionView.frame = CGRectMake(66, 95, hDiff * 7, [daysView numberOfRows]*vDiff);
     
     [UIView beginAnimations:@"fadeInViews" context:nil];
     [UIView setAnimationDuration:0.1f];
@@ -482,7 +482,7 @@
 		arrowPosX = 333;
 	}
     
-    if([daysView addExtraRow]) {
+    if([daysView numberOfRows] == 6) {
         //NSLog(@"Added extra row");
 		
 		//bottom left corner
@@ -574,7 +574,7 @@
     
     
     //Dividers
-    float addedHeight = ([daysView addExtraRow] ? 24 : 0);
+    float addedHeight = ([daysView numberOfRows] == 6 ? 24 : 0);
     for(int i = 0; i < dayTitles.count-1; i++) {
         //// divider Drawing
 		float xpos = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone ? 99 : 96;
@@ -589,7 +589,7 @@
     
     //// Rounded Rectangle 2 Drawing
     UIBezierPath* roundedRectangle2Path = [UIBezierPath bezierPath];
-    if([daysView addExtraRow]) {
+    if([daysView numberOfRows] == 6) {
 		//bottom left
         [roundedRectangle2Path moveToPoint: CGPointMake(42, 267.42)];
         [roundedRectangle2Path addCurveToPoint: CGPointMake(52, 278.4) controlPoint1: CGPointMake(42, 273.49) controlPoint2: CGPointMake(46.48, 278.4)];
@@ -635,7 +635,7 @@
     [roundedRectangle2Path closePath];
     CGContextSaveGState(context);
     [roundedRectangle2Path addClip];
-    float endPoint = ([daysView addExtraRow] ? 278.4 : 256.4);
+    float endPoint = ([daysView numberOfRows] == 6 ? 278.4 : 256.4);
     CGContextDrawLinearGradient(context, gradient2, CGPointMake(206.75, endPoint), CGPointMake(206.75, 31.4), 0);
     CGContextRestoreGState(context);
     
@@ -740,7 +740,7 @@
         arrowPosX = 346;
     }
     
-    if([daysView addExtraRow]) {
+    if([daysView numberOfRows] == 6) {
         //NSLog(@"Added extra row");
         [roundedRectanglePath moveToPoint: CGPointMake(42, 267.42)];
         [roundedRectanglePath addCurveToPoint: CGPointMake(52, 278.4) controlPoint1: CGPointMake(42, 273.49) controlPoint2: CGPointMake(46.48, 278.4)];
@@ -810,7 +810,7 @@
     
     
     //Dividers
-    float addedHeight = ([daysView addExtraRow] ? 24 : 0);
+    float addedHeight = ([daysView numberOfRows] == 6 ? 24 : 0);
     for(int i = 0; i < dayTitles.count-1; i++) {
         //// divider Drawing
         UIBezierPath* dividerPath = [UIBezierPath bezierPathWithRect: CGRectMake(96+i*hDiff, 73.5, 0.5, 168+addedHeight)];
@@ -824,7 +824,7 @@
     
     //// Rounded Rectangle 2 Drawing
     UIBezierPath* roundedRectangle2Path = [UIBezierPath bezierPath];
-    if([daysView addExtraRow]) {
+    if([daysView numberOfRows] == 6) {
         [roundedRectangle2Path moveToPoint: CGPointMake(42, 267.42)];
         [roundedRectangle2Path addCurveToPoint: CGPointMake(52, 278.4) controlPoint1: CGPointMake(42, 273.49) controlPoint2: CGPointMake(46.48, 278.4)];
         [roundedRectangle2Path addLineToPoint: CGPointMake(361.5, 278.4)];
@@ -854,7 +854,7 @@
     [roundedRectangle2Path closePath];
     CGContextSaveGState(context);
     [roundedRectangle2Path addClip];
-    float endPoint = ([daysView addExtraRow] ? 278.4 : 256.4);
+    float endPoint = ([daysView numberOfRows] == 6 ? 278.4 : 256.4);
     CGContextDrawLinearGradient(context, gradient2, CGPointMake(206.75, endPoint), CGPointMake(206.75, 31.4), 0);
     CGContextRestoreGState(context);
     
